@@ -1,0 +1,31 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'dockerfile'
+      - '.github/workflows/build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ['0.65.0']
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v4
+      - 
+        name: Build and push
+        uses: hieupth/docker-actions/docker-build-push@main
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          image: ${{ vars.DOCKERHUB_USERNAME }}/frpserver
+          tag: ${{ matrix.version }}
+          platform: linux/amd64,linux/arm64
+          dockerfile: dockerfile
