@@ -1,0 +1,44 @@
+networks:
+  frps-network:
+    driver: bridge
+
+x-frps-service: &frps-service
+  image: hieupth/frpserver:0.65.0
+  restart: always
+  # Security: Run as non-root user
+  user: 999:999
+  # Security: Read-only root filesystem
+  read_only: true
+  # Security: Drop all capabilities
+  cap_drop:
+    - ALL
+  # Security: No new privileges
+  security_opt:
+    - no-new-privileges:true
+  networks:
+    - frps-network
+
+services:
+  frps:
+    <<: *frps-service
+    # Ports must be defined when using as submodule or for standalone use
+    # Uncomment and modify as needed:
+    # ports:
+    #   - 7000:7000   # FRP server (required)
+    #   - 7500:7500   # Dashboard (required)
+    #   - 2095:2095   # TCP multiplex (optional)
+    volumes:
+      - ./frps.toml:/etc/frp/frp.toml:ro
+    environment:
+      - SSL_CERT_FILE=${SSL_CERT_FILE:-/ssl/fullchain.pem}
+      - SSL_KEY_FILE=${SSL_KEY_FILE:-/ssl/privkey.pem}
+      - SSL_TRUST_FILE=${SSL_TRUST_FILE:-}
+      - AUTH_TOKEN=${AUTH_TOKEN:-change-me}
+      - DASHBOARD_USER=${DASHBOARD_USER:-admin}
+      - DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD:-1234}
+      - SUBDOMAIN_HOST=${SUBDOMAIN_HOST:-frps.com}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"

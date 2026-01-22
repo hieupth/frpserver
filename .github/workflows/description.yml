@@ -1,0 +1,26 @@
+name: Update Docker Hub Description
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'README.md'
+
+permissions:
+  contents: read
+
+jobs:
+  update-description:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Update Docker Hub description
+        uses: hieupth/docker-actions/docker-description@main
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ vars.DOCKERHUB_USERNAME }}/frpserver
+          description_file: README.md

@@ -1,0 +1,53 @@
+bindAddr = "0.0.0.0"
+bindPort = 7000
+kcpBindPort = 7000
+
+# Pool count in each proxy will keep no more than maxPoolCount
+transport.maxPoolCount = 5
+
+# TLS configuration
+transport.tls.force = true
+transport.tls.certFile = "{{.Envs.SSL_CERT_FILE}}"
+transport.tls.keyFile = "{{.Envs.SSL_KEY_FILE}}"
+{{if ne .Envs.SSL_TRUST_FILE ""}}transport.tls.trustedCaFile = "{{.Envs.SSL_TRUST_FILE}}"{{end}}
+
+# Virtual host ports
+vhostHTTPPort = 8080
+vhostHTTPSPort = 8443
+
+# TCP multiplex HTTP connect port
+tcpmuxHTTPConnectPort = 2095
+
+# Dashboard configuration
+webServer.addr = "0.0.0.0"
+webServer.port = 7500
+webServer.user = "{{.Envs.DASHBOARD_USER}}"
+webServer.password = "{{.Envs.DASHBOARD_PASSWORD}}"
+
+# Enable Prometheus metrics
+enablePrometheus = true
+
+# Logging
+log.to = "console"
+log.level = "{{.Envs.LOG_LEVEL}}"
+log.maxDays = 3
+log.disablePrintColor = false
+
+# Send detailed errors to client
+detailedErrorsToClient = true
+
+# Authentication
+auth.method = "token"
+auth.token = "{{.Envs.AUTH_TOKEN}}"
+
+# Max ports per client (0 = unlimited)
+maxPortsPerClient = 0
+
+# Subdomain host for virtual hosts
+subDomainHost = "{{.Envs.SUBDOMAIN_HOST}}"
+
+# UDP packet size
+udpPacketSize = 1500
+
+# NAT hole punching data retention
+natholeAnalysisDataReserveHours = 168
