@@ -2,30 +2,82 @@ name: Build
 
 on:
   workflow_dispatch:
+    inputs:
+      from_tag:
+        description: 'Build from tag (e.g., 0.60.0)'
+        required: false
+        default: ''
+      build_mode:
+        description: 'Build mode'
+        required: true
+        default: 'latest'
+        type: choice
+        options:
+          - latest
+          - all
   push:
-    branches:
-      - 'main'
+    branches: ['main']
     paths:
-      - 'dockerfile'
-      - '.github/workflows/build.yml'
+      - ".github/workflows/build.yml"
+      - ".github/workflows/scripts/*"
+      - "dockerfile"
 
 jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate build matrix
+        id: matrix
+        env:
+          FROM_TAG: ${{ inputs.from_tag || '' }}
+          BUILD_MODE: ${{ inputs.build_mode || 'latest' }}
+        run: |
+          cd .github/workflows/scripts
+          MATRIX=$(./build-matrix.sh)
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          echo "Generated matrix: $MATRIX"
+
   build:
+    needs: detect
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        version: ['0.65.0']
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect.outputs.matrix) }}
     steps:
-      - 
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v4
-      - 
-        name: Build and push
-        uses: hieupth/docker-actions/docker-build-push@main
+
+      - name: Generate image tags
+        id: tags
+        run: |
+          TAGS="${{ vars.DOCKERHUB_USERNAME }}/frpserver:${{ matrix.tag }}"
+          if [ "${{ matrix.is_latest }}" = "true" ]; then
+            TAGS="$TAGS,${{ vars.DOCKERHUB_USERNAME }}/frpserver:latest"
+          fi
+          echo "tags=$TAGS"
+          echo "tags=$TAGS" >> $GITHUB_OUTPUT
+
+      - name: Prepare Docker environment
+        uses: hieupth/gh-docker-actions/docker-prepare@main
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          image: ${{ vars.DOCKERHUB_USERNAME }}/frpserver
-          tag: ${{ matrix.version }}
-          platform: linux/amd64,linux/arm64
-          dockerfile: dockerfile
+          free_disk_space: "false"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          build-args: |
+            FRP_VERSION=${{ matrix.version }}
+          cache-from: ""
+          cache-to: ""

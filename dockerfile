@@ -8,11 +8,11 @@ ARG VARIANT
 ARG FRP_VERSION
 # Install necessary packages.
 RUN apk update && apk add --no-cache git make
-# Clone frp source code.
-RUN git clone https://github.com/fatedier/frp.git /build
+# Clone frp source code (shallow clone at specific tag).
+RUN git clone --depth 1 --branch v${FRP_VERSION} https://github.com/fatedier/frp.git /build
 # Build frp from source.
 WORKDIR /build
-RUN git checkout v${FRP_VERSION} && make ${VARIANT}
+RUN make ${VARIANT}
 
 FROM ${BASE}
 # Recall arguments.

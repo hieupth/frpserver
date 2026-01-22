@@ -1,0 +1,14 @@
+x-frps-service: &frps-service
+  image: hieupth/frpserver:0.68.1
+  restart: always
+  network_mode: host
+  user: 999:999
+  read_only: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  logging:
+    options:
+      max-size: "10m"
+      max-file: "3"
