@@ -1,8 +1,8 @@
 ARG VARIANT=frps
 ARG BASE=alpine:3.21
-ARG FRP_VERSION=0.66.0
+ARG FRP_VERSION=0.68.0
 
-FROM golang:alpine AS BUILD
+FROM golang:alpine AS build
 # Recall arguments.
 ARG VARIANT
 ARG FRP_VERSION
@@ -20,7 +20,7 @@ ARG VARIANT
 # Install packages.
 RUN apk update && apk upgrade && apk add --no-cache curl tini
 # Copy compiled bin.
-COPY --from=BUILD /build/bin/${VARIANT} /usr/bin/frp
+COPY --from=build /build/bin/${VARIANT} /usr/bin/frp
 COPY  ./entrypoint.sh /entrypoint.sh
 # Set tini.
 ENTRYPOINT ["tini", "-g", "--"]

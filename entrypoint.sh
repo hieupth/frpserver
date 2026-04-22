@@ -1,3 +1,3 @@
 #!/bin/sh
 set -e
-exec frp -c ${FRP_CONFIG_FILE:-/etc/frp/frp.toml}
+exec frp -c ${CONFIG_FILE:-/etc/frp/config.toml}

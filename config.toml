@@ -1,0 +1,52 @@
+bindAddr = "{{ or .Envs.BIND_ADDR `0.0.0.0` }}"
+bindPort = {{ or .Envs.BIND_PORT `7000` }}
+kcpBindPort = {{ or .Envs.KCP_BIND_PORT `7000` }}
+
+# Pool count in each proxy will keep no more than maxPoolCount
+transport.maxPoolCount = {{ or .Envs.TRANSPORT_MAX_POOL_COUNT `5` }}
+
+# TLS configuration
+transport.tls.force = {{ or .Envs.TRANSPORT_TLS_FORCE `true` }}
+transport.tls.certFile = "{{ or .Envs.TRANSPORT_TLS_CERT_FILE `/run/secrets/ssl_cert` }}"
+transport.tls.keyFile = "{{ or .Envs.TRANSPORT_TLS_KEY_FILE `/run/secrets/ssl_key` }}"
+
+# Virtual host ports
+vhostHTTPPort = {{ or .Envs.VHOST_HTTP_PORT `8080` }}
+vhostHTTPSPort = {{ or .Envs.VHOST_HTTPS_PORT `8443` }}
+
+# TCP multiplex HTTP connect port
+tcpmuxHTTPConnectPort = {{ or .Envs.TCPMUX_HTTP_CONNECT_PORT `2095` }}
+
+# Dashboard configuration
+webServer.addr = "{{ or .Envs.WEB_SERVER_ADDR `0.0.0.0` }}"
+webServer.port = {{ or .Envs.WEB_SERVER_PORT `7500` }}
+webServer.user = "{{ or .Envs.DASHBOARD_USER `admin` }}"
+webServer.password = "{{ or .Envs.DASHBOARD_PASSWORD `admin` }}"
+
+# Enable Prometheus metrics
+enablePrometheus = {{ or .Envs.ENABLE_PROMETHEUS `true` }}
+
+# Logging
+log.to = "{{ or .Envs.LOG_TO `console` }}"
+log.level = "{{ or .Envs.LOG_LEVEL `info` }}"
+log.maxDays = {{ or .Envs.LOG_MAX_DAYS `3` }}
+log.disablePrintColor = {{ or .Envs.LOG_DISABLE_PRINT_COLOR `false` }}
+
+# Send detailed errors to client
+detailedErrorsToClient = {{ or .Envs.DETAILED_ERRORS_TO_CLIENT `false` }}
+
+# Authentication
+auth.method = "token"
+auth.token = "changeme"
+
+# Max ports per client (0 = unlimited)
+maxPortsPerClient = {{ or .Envs.MAX_PORTS_PER_CLIENT `0` }}
+
+# Subdomain host for virtual hosts
+subDomainHost = "{{ or .Envs.SUBDOMAIN_HOST `localhost` }}"
+
+# UDP packet size
+udpPacketSize = {{ or .Envs.UDP_PACKET_SIZE `1500` }}
+
+# NAT hole punching data retention
+natholeAnalysisDataReserveHours = {{ or .Envs.NATHOLE_ANALYSIS_DATA_RESERVE_HOURS `168` }}

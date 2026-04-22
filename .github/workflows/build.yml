@@ -19,8 +19,10 @@ on:
     branches: ['main']
     paths:
       - ".github/workflows/build.yml"
-      - ".github/workflows/scripts/*"
+      - ".github/workflows/scripts/build-matrix.sh"
+      - ".github/workflows/scripts/build.conf"
       - "dockerfile"
+      - "entrypoint.sh"
 
 jobs:
   detect:
@@ -79,5 +81,3 @@ jobs:
           tags: ${{ steps.tags.outputs.tags }}
           build-args: |
             FRP_VERSION=${{ matrix.version }}
-          cache-from: ""
-          cache-to: ""
